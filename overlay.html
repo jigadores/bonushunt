@@ -27,9 +27,9 @@
     }
   </style>
 </head>
-<body id="content"></body>
+<body id="content">A carregar…</body>
 <script>
-  const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS9hGpcm-QabmrAUOvYDyoqwxFOZCAxSoFV37T0IIsg6n5cAsjOySxISexcdIZxJSOZdfuDNumYXY84/pub?output=csv";
+  const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ-HBbPuLxCsFqF9AVlR_1zmTO-PuQlo0PEcHeX5ocNdubs0wJVs2uHKd26--9GzF4yDUfa8qua36GS/pub?output=csv";
   const baseUrl = "https://jigadores.github.io/bonushunt/";
 
   function formatName(name) {
@@ -37,30 +37,35 @@
   }
 
   async function fetchSlots() {
-    const response = await fetch(url);
-    const text = await response.text();
-    const lines = text.trim().split('\n');
-    const headers = lines[0].split(',');
-    const slotIndex = headers.indexOf('slot');
-    const container = document.getElementById("content");
-    container.innerHTML = "";
-    lines.slice(1).forEach(line => {
-      const cols = line.split(',');
-      const slotName = cols[slotIndex].trim();
-      if (slotName) {
-        const imgName = formatName(slotName);
-        const imgPath = baseUrl + imgName;
-        const html = 
-          <div class="slot">
-            <img src="${imgPath}" alt="${slotName}">
-            <div class="slot-name">${slotName}</div>
-          </div>;
-        container.innerHTML += html;
-      }
-    });
+    try {
+      const response = await fetch(url);
+      const text = await response.text();
+      const lines = text.trim().split('\n');
+      const headers = lines[0].split(',');
+      const slotIndex = headers.indexOf('slot');
+      const container = document.getElementById("content");
+      container.innerHTML = "";
+      lines.slice(1).forEach(line => {
+        const cols = line.split(',');
+        const slotName = cols[slotIndex]?.trim();
+        if (slotName) {
+          const imgName = formatName(slotName);
+          const imgPath = baseUrl + imgName;
+          const html = 
+            <div class="slot">
+              <img src="${imgPath}" alt="${slotName}">
+              <div class="slot-name">${slotName}</div>
+            </div>;
+          container.innerHTML += html;
+        }
+      });
+    } catch (err) {
+      document.getElementById("content").innerText = "Erro ao carregar slots.";
+      console.error(err);
+    }
   }
 
   fetchSlots();
-  setInterval(fetchSlots, 5000); // Atualiza a cada 5 segundos
+  setInterval(fetchSlots, 5000);
 </script>
 </html>
